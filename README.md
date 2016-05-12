@@ -1,4 +1,5 @@
 # go-butler
+A mumble bot based on the [Gumble libary](https://github.com/layeh/gumble/)
 
 [![Build Status](https://drone.io/github.com/njdart/go-butler/status.png)](https://drone.io/github.com/njdart/go-butler/latest)
 
