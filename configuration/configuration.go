@@ -10,6 +10,10 @@ import (
 )
 
 type ButlerConfiguration struct {
+  Log struct {
+    File string `json:"file"`
+    Level string `json:"level"`
+  } `json:"log"`
   Bot struct {
     Username string `json:"username"`
   } `json:"bot"`

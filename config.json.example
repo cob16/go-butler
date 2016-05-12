@@ -1,4 +1,8 @@
 {
+  "log": {
+    "file": "./butler.log",
+    "level": "error"
+  },
   "bot": {
     "username": "GoButler"
   },
