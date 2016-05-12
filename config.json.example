@@ -1,0 +1,13 @@
+{
+  "bot": {
+    "username": "GoButler"
+  },
+  "server": {
+    "host": "Server.co.uk",
+    "port": 64738,
+    "insecureSkipVerify": true
+  },
+  "features": {
+
+  }
+}
