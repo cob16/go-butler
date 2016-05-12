@@ -5,7 +5,7 @@ A mumble bot based on the [Gumble libary](https://github.com/layeh/gumble/)
 
 ## Features
 - [ ] Load from config file
-- [ ] logging
+- [x] logging
 - [ ] Tests
 - [ ] check ACL's so that cmds can be made admin only
 - [ ] check status of Seam and other services
