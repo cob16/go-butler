@@ -5,56 +5,20 @@ package main
 import (
   "fmt"
   "net"
-  "log"
-  "os"
-  "io"
 
   "github.com/layeh/gumble/gumble"
   "github.com/layeh/gumble/gumbleutil"
-  "github.com/njdart/go-butler/configuration"
+  "./configuration"
 )
-
-var (
-  Info    *log.Logger
-  Warning *log.Logger
-  Error   *log.Logger
-)
-
-//logs everything to the same file and Stdout
-func InitLog(FileHandle io.Writer) {
-  Handle := io.MultiWriter(FileHandle, os.Stdout)
-
-  Info = log.New(Handle,
-  "INFO: ",
-  log.Ldate | log.Ltime | log.Lshortfile)
-
-  Warning = log.New(Handle,
-  "WARNING: ",
-  log.Ldate | log.Ltime | log.Lshortfile)
-
-  Error = log.New(Handle,
-  "ERROR: ",
-  log.Ldate | log.Ltime | log.Lshortfile)
-}
 
 func main() {
-
   configuration, err := configuration.LoadConfiguration()
   if err != nil {
     panic(err)
   }
-
-  file, err := os.OpenFile(configuration.Log.File, os.O_CREATE | os.O_WRONLY | os.O_APPEND, 0666)
-  if err != nil {
-    panic(err)
-  }
-
-  InitLog(file)
-  Info.Println("Special Information")
-  Warning.Println("There is something you need to know about")
-  Error.Println("Something has failed")
-
   tlsConfig, gumbleConfig := configuration.ExplodeConfiguration()
+  log := configuration.GetLogger()
+  log.Info("go-butler has sucessfully started!")
 
   keepAlive := make(chan bool)
 
@@ -69,19 +33,18 @@ func main() {
     },
     //kill the program if we are disconnected
     Disconnect: func(e *gumble.DisconnectEvent) {
-      Info.Println("gumble was Disconnected from the server")
+      log.Info("gumble was Disconnected from the server")
       keepAlive <- true
     },
   })
 
   client, err := gumble.DialWithDialer(new(net.Dialer), configuration.GetUri(), &gumbleConfig, &tlsConfig)
   if err != nil {
-    fmt.Println(err)
-    panic(err)
+    log.Panic(err)
   }
 
   for _, user := range client.Users {
-    fmt.Println(user)
+    log.Info(user)
   }
 
   <-keepAlive
