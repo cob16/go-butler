@@ -8,7 +8,7 @@ import (
 
   "github.com/layeh/gumble/gumble"
   "github.com/layeh/gumble/gumbleutil"
-  "./configuration"
+  "github.com/njdart/go-butler/configuration"
 )
 
 func main() {
