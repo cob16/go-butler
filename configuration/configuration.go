@@ -39,7 +39,6 @@ func (cfg *ButlerConfiguration)  GetLogger() *logrus.Logger {
 func initLog(useStdLogger bool, config ButlerConfiguration) {
   logcfg := config.Log
   if !useStdLogger {
-    fmt.Print("got here")
     Logger = logrus.New()
     //Logger.SetFormatter(&Logger.JSONFormatter{})
 
@@ -94,7 +93,7 @@ func (cfg *ButlerConfiguration) ExplodeConfiguration() (tls.Config, gumble.Confi
   tlsConfig := tls.Config{}
   tlsConfig.InsecureSkipVerify = true
 
-  fmt.Printf("%+v\n", tlsConfig)
+  Logger.Info(tlsConfig)
 
   gumbleConfig := gumble.Config{}
 
@@ -109,7 +108,5 @@ func (cfg *ButlerConfiguration) ExplodeConfiguration() (tls.Config, gumble.Confi
 
 func (cfg *ButlerConfiguration) GetUri() string {
   uri := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
-  fmt.Println(cfg.Server.Host)
-  fmt.Println(cfg.Server.Port)
   return uri
 }
