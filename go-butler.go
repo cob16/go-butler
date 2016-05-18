@@ -36,27 +36,21 @@ func init() {
   ChatCommand = chatCmd
 }
 
-
-//parse steam connect strings and provide a html button to the channel
-func parseSteamConnect(e *gumble.TextMessageEvent) {
-  log.Info("steam link match ip: %d pass: %d", result[1], result[2])
-  button := fmt.Sprintf("<br />IP: %s <br /> PASS: %s <br /><strong><a href='steam://connect/%s/%s'>CLICK TO CONNECT TO SERVER</a></strong><br />",
-    result[1], result[2], result[1], result[2])
-  log.Debug(button)
-  e.Client.Self.Channel.Send(button, true)
-}
-
 func HandleMessage(e *gumble.TextMessageEvent) {
+  //parse steam connect strings and provide a html button to the channel
   result := Steamconnect.FindStringSubmatch(e.Message)
   if result != nil {
-    parseSteamConnect(e)
-    return nil
-  }
-  result = ChatCommand.FindStringSubmatch(e.Message)
-  if result != nil {
-    //TODO COLLECT AND MATCH AVAILABLE COMMANDS WITH COMPORTING SUBROUTINES
-    //TODO else retrun a nice message or/and cmds printout to user that sent the command
-    return nil
+    log.Info("steam link match ip: %d pass: %d", result[1], result[2])
+    button := fmt.Sprintf("<br />IP: %s <br /> PASS: %s <br /><strong><a href='steam://connect/%s/%s'>CLICK TO CONNECT TO SERVER</a></strong><br />",
+      result[1], result[2], result[1], result[2])
+    log.Debug(button)
+    e.Client.Self.Channel.Send(button, true)
+  } else { //try user cmds instead
+    result = ChatCommand.FindStringSubmatch(e.Message)
+    if result != nil {
+      //TODO COLLECT AND MATCH AVAILABLE COMMANDS WITH COMPORTING SUBROUTINES
+      // TODO else retrun a nice message or/and cmds printout to user that sent the command
+    }
   }
 }
 
