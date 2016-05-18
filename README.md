@@ -17,5 +17,5 @@ A mumble bot based on the [Gumble libary](https://github.com/layeh/gumble/)
 - [ ] Tests
 - [ ] check ACL's so that cmds can be made admin only
 - [ ] check status of Seam and other services
-- [ ] format source connect cmds to button
+- [x] format source connect cmds to button
 - [ ] Be able to talk back to users
