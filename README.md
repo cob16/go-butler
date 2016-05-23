@@ -15,8 +15,8 @@ A mumble bot based on the [Gumble libary](https://github.com/layeh/gumble/)
 - [x] Load from config file
 - [ ] Load acess tokens
 - [x] logging
+- [x] format source connect cmds to button
 - [ ] Tests
 - [ ] check ACL's so that cmds can be made admin only
-- [ ] check status of Seam and other services
-- [x] format source connect cmds to button
+- [ ] intgrate [steam gauges](https://steamgaug.es/docs)
 - [ ] Be able to talk back to users
