@@ -2,14 +2,14 @@
 package steamgauge
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"encoding/json"
 )
 
 type Service struct {
-	Online        int `json:"online"` // 1 is up 2 is down
-	Response_time int `json:"time"` // time in ms
+	Online        int    `json:"online"` // 1 is up 2 is down
+	Response_time int    `json:"time"`   // time in ms
 	Error_msg     string `json:"error"`
 }
 
@@ -25,11 +25,11 @@ type SteamStatus struct {
 	Client struct {
 		online int `json:"online"`
 	} `json:"ISteamClient"`
-	Community Service `json:"SteamCommunity"`
-	Store Service `json:"SteamStore"`
-	User Service `json:"ISteamUser"`
-  Items ValveGameService `json:"IEconItems"`
-	Matchmaking ValveGameService`json:"ISteamGameCoordinator"`
+	Community   Service          `json:"SteamCommunity"`
+	Store       Service          `json:"SteamStore"`
+	User        Service          `json:"ISteamUser"`
+	Items       ValveGameService `json:"IEconItems"`
+	Matchmaking ValveGameService `json:"ISteamGameCoordinator"`
 }
 
 const apiv2url string = "https://steamgaug.es/api/v2"
@@ -52,13 +52,21 @@ func GetSteamStatus() (SteamStatus, error) {
 	}
 }
 
-//format's service into a nice html string
-func (service Service) FmtOnlineHtml() (string){
-	var tick, cross string = `☑`, `☒`
+//get service.Online in bool
+func (service Service) Bool() bool {
 	if service.Online == 1 {
+		return true
+	} else {
+		return false
+	}
+}
+
+//format's service into a nice unicode tick or cross
+func (service Service) FmtOnlineHtml() string {
+	var tick, cross string = `☑`, `☒`
+	if service.Bool() {
 		return tick
 	} else {
 		return cross
 	}
 }
-
