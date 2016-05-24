@@ -3,8 +3,10 @@ package steamgauge
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type Service struct {
@@ -34,6 +36,8 @@ type SteamStatus struct {
 
 const apiv2url string = "https://steamgaug.es/api/v2"
 
+const HtmlNewLine string = `<br />`
+
 //makes the https request to steamgaug.es
 // returns SteamStatus struct
 func GetSteamStatus() (SteamStatus, error) {
@@ -61,12 +65,49 @@ func (service Service) Bool() bool {
 	}
 }
 
-//format's service into a nice unicode tick or cross
+func HtmlColour(colour string, content string) string {
+	return fmt.Sprintf("<span style='color:%s'>%s</span>", colour, content)
+}
+
+//format's service online status into a nice unicode green tick or red cross
 func (service Service) FmtOnlineHtml() string {
 	var tick, cross string = `☑`, `☒`
+	var red, green = "#aa0000", "#00aa00"
 	if service.Bool() {
-		return tick
+		return HtmlColour(green, tick)
 	} else {
-		return cross
+		return HtmlColour(red, cross)
 	}
+}
+
+// formats html for status of provided Services
+func getStatus(name string, items Service, matchmaking Service) string {
+	return fmt.Sprintf("<strong>%s %s status:</strong> %s %s Item servers (%dms) %s  %s %s %s  %s",
+		HtmlNewLine,
+		name,
+		HtmlNewLine,
+		items.FmtOnlineHtml(),
+		items.Response_time,
+		items.Error_msg,
+		HtmlNewLine,
+		matchmaking.FmtOnlineHtml(),
+		" Matchmaking servers",
+		matchmaking.Error_msg,
+	)
+}
+
+func (status SteamStatus) GetStatusTF2() string {
+	return getStatus("Team Fortress 2", status.Items.TF2, status.Matchmaking.TF2)
+}
+
+func (status SteamStatus) GetStatusCSGO() string {
+	return getStatus("Counter-Strike: Global Offensive", status.Items.CSGO, status.Matchmaking.CSGO)
+}
+
+func (status SteamStatus) GetStatusDOTA2() string {
+	return getStatus("Defense of the Ancients", status.Items.DOTA2, status.Matchmaking.DOTA2)
+}
+
+func (status SteamStatus) GetStatus() string {
+	return strings.Join([]string{status.GetStatusTF2(), status.GetStatusCSGO(), status.GetStatusDOTA2()}, "")
 }

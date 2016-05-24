@@ -97,7 +97,7 @@ func (cfg *ButlerConfiguration) ExplodeConfiguration() (tls.Config, gumble.Confi
 
   gumbleConfig := gumble.Config{}
 
-  if gumbleConfig.Username != "" {
+  if len(cfg.Bot.Username) > 0 {
     gumbleConfig.Username = cfg.Bot.Username
   } else {
     gumbleConfig.Username = "gumble-test"

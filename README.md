@@ -18,5 +18,5 @@ A mumble bot based on the [Gumble libary](https://github.com/layeh/gumble/)
 - [x] format source connect cmds to button
 - [ ] Tests
 - [ ] check ACL's so that cmds can be made admin only
-- [ ] intgrate [steam gauges](https://steamgaug.es/docs)
+- [x] intgrate [steam gauges](https://steamgaug.es/docs)
 - [ ] Be able to talk back to users
