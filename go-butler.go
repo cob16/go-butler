@@ -9,9 +9,8 @@ import (
   "github.com/layeh/gumble/gumble"
   "github.com/layeh/gumble/gumbleutil"
   "github.com/Sirupsen/logrus"
-  //"github.com/njdart/go-butler/configuration"
-  "./configuration"
-  "./steamgauge"
+  "github.com/njdart/go-butler/steamgauge"
+  "github.com/njdart/go-butler/configuration"
 )
 
 var (
