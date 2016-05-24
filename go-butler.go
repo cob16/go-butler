@@ -9,7 +9,9 @@ import (
   "github.com/layeh/gumble/gumble"
   "github.com/layeh/gumble/gumbleutil"
   "github.com/Sirupsen/logrus"
-  "github.com/njdart/go-butler/configuration"
+  //"github.com/njdart/go-butler/configuration"
+  "./configuration"
+  "./steamgauge"
 )
 
 var (
@@ -21,9 +23,22 @@ var (
 //TODO attach this map
 var comands = map[string]string{
   "help": "Display this message.",
+  "status": "show the status of steam",
+}
+
+var HelpString string
+
+func FormatHelpString(comands map[string]string) (string) {
+  out := "<br />Available comands:"
+  for cmd, helptext := range comands {
+    out += fmt.Sprintf("<br /><strong>%s</strong> - %s", cmd, helptext)
+  }
+  return out
 }
 
 func init() {
+  HelpString = FormatHelpString(comands)
+
   steamconnect, err := regexp.Compile(`connect ([A-Za-z0-9.:]+); *password (.*)`) //connect <ip>; <password>
   if err != nil {
     panic(err)
@@ -48,20 +63,36 @@ func HandleMessage(e *gumble.TextMessageEvent) {
   } else { //try user cmds instead
     result = ChatCommand.FindStringSubmatch(e.Message)
     if result != nil {
-      //TODO COLLECT AND MATCH AVAILABLE COMMANDS WITH COMPORTING SUBROUTINES
-      // TODO else retrun a nice message or/and cmds printout to user that sent the command
+      switch result[1] {
+      case  "help":
+        e.Sender.Send(HelpString)
+      case "status":
+        SteamStatus(e.Client)
+      default:
+        //todo nice cmd not found msg
+      }
     }
   }
 }
 
+func SteamStatus(client *gumble.Client) {
+
+	status, err := steamgauge.GetSteamStatus()
+	if err != nil {
+		panic(err)
+	}
+  itemstatus := fmt.Sprintf("%s %s \n", status.Items.TF2.FmtOnlineHtml(), "tf2 item servers")
+  client.Self.Channel.Send(itemstatus, true)
+}
+
 func main() {
-  configuration, err := configuration.LoadConfiguration()
+  config, err := configuration.LoadConfiguration()
   if err != nil {
     panic(err)
   }
-  log = configuration.GetLogger()
+  log = config.GetLogger()
   log.Info("go-butler has sucessfully started!")
-  tlsConfig, gumbleConfig := configuration.ExplodeConfiguration()
+  tlsConfig, gumbleConfig := config.ExplodeConfiguration()
 
   keepAlive := make(chan bool)
 
@@ -82,8 +113,8 @@ func main() {
     },
   })
 
-  log.Info("connecting to" + configuration.GetUri())
-  client, err := gumble.DialWithDialer(new(net.Dialer), configuration.GetUri(), &gumbleConfig, &tlsConfig)
+  log.Info("connecting to" + config.GetUri())
+  client, err := gumble.DialWithDialer(new(net.Dialer), config.GetUri(), &gumbleConfig, &tlsConfig)
   if err != nil {
     log.Panic(err)
   } else {
