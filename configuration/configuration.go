@@ -18,6 +18,7 @@ type ButlerConfiguration struct {
            } `json:"log"`
   Bot      struct {
              Username string `json:"username"`
+             AccessTokens []string `json:"accessTokens"`
            } `json:"bot"`
   Server   struct {
              Host               string `json:"host"`
@@ -102,6 +103,7 @@ func (cfg *ButlerConfiguration) ExplodeConfiguration() (tls.Config, gumble.Confi
   } else {
     gumbleConfig.Username = "gumble-test"
   }
+  gumbleConfig.Tokens = cfg.Bot.AccessTokens
 
   return tlsConfig, gumbleConfig
 }

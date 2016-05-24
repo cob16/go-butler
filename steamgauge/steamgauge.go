@@ -69,7 +69,8 @@ func HtmlColour(colour string, content string) string {
 	return fmt.Sprintf("<span style='color:%s'>%s</span>", colour, content)
 }
 
-//format's service online status into a nice unicode green tick or red cross
+// format's service online status into a nice unicode green tick or red cross
+// styled for mumble
 func (service Service) FmtOnlineHtml() string {
 	var tick, cross string = `☑`, `☒`
 	var red, green = "#aa0000", "#00aa00"

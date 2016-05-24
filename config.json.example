@@ -4,7 +4,10 @@
     "level": "error"
   },
   "bot": {
-    "username": "GoButler"
+    "username": "GoButler",
+    "accessTokens": [
+      "exampleToken"
+    ]
   },
   "server": {
     "host": "Server.co.uk",

@@ -13,7 +13,7 @@ A mumble bot based on the [Gumble libary](https://github.com/layeh/gumble/)
 
 ## Features
 - [x] Load from config file
-- [ ] Load acess tokens
+- [x] Load acess tokens
 - [x] logging
 - [x] format source connect cmds to button
 - [ ] Tests
