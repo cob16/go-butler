@@ -18,6 +18,7 @@ type ButlerConfiguration struct {
            } `json:"log"`
   Bot      struct {
              Username string `json:"username"`
+             RecursiveChannelMessages bool `json:"recursiveChannelMessages"`
              AccessTokens []string `json:"accessTokens"`
            } `json:"bot"`
   Server   struct {

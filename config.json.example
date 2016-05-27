@@ -5,6 +5,7 @@
   },
   "bot": {
     "username": "GoButler",
+    "recursiveChannelMessages" : true,
     "accessTokens": [
       "exampleToken"
     ]

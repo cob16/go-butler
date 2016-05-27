@@ -9,6 +9,8 @@ import (
 	"github.com/layeh/gumble/gumbleutil"
 	"github.com/njdart/go-butler/configuration"
 	"github.com/njdart/go-butler/steamgauge"
+	//"./configuration"
+	//"./steamgauge"
 	"net"
 	"regexp"
 )
@@ -67,11 +69,11 @@ func FormatSteamconnect(result []string) string {
 	return button
 }
 
-func HandleMessage(e *gumble.TextMessageEvent) {
+func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfiguration) {
 	//parse steam connect strings and provide a html button to the channel
 	result := Steamconnect.FindStringSubmatch(e.Message)
 	if result != nil {
-		e.Client.Self.Channel.Send(FormatSteamconnect(result), true)
+		e.Client.Self.Channel.Send(FormatSteamconnect(result), *config.Bot.RecursiveChannelMessages)
 	} else { //try user cmds instead
 		result = ChatCommand.FindStringSubmatch(e.Message)
 		if result != nil {
@@ -79,7 +81,7 @@ func HandleMessage(e *gumble.TextMessageEvent) {
 			case "help":
 				e.Sender.Send(HelpString)
 			case "status":
-				e.Client.Self.Channel.Send(SteamStatus(result), false)
+				e.Client.Self.Channel.Send(SteamStatus(result), *config.Bot.RecursiveChannelMessages)
 			default:
 				e.Sender.Send(ComandNotFound(result[1]))
 			}
@@ -126,7 +128,7 @@ func main() {
 		},
 		TextMessage: func(e *gumble.TextMessageEvent) {
 			log.Infof("Received text message: %s\n", e.Message)
-			HandleMessage(e)
+			HandleMessage(e, &config)
 		},
 		//kill the program if we are disconnected
 		Disconnect: func(e *gumble.DisconnectEvent) {
