@@ -73,7 +73,7 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 	//parse steam connect strings and provide a html button to the channel
 	result := Steamconnect.FindStringSubmatch(e.Message)
 	if result != nil {
-		e.Client.Self.Channel.Send(FormatSteamconnect(result), *config.Bot.RecursiveChannelMessages)
+		e.Client.Self.Channel.Send(FormatSteamconnect(result), config.Bot.RecursiveChannelMessages)
 	} else { //try user cmds instead
 		result = ChatCommand.FindStringSubmatch(e.Message)
 		if result != nil {
@@ -81,7 +81,7 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 			case "help":
 				e.Sender.Send(HelpString)
 			case "status":
-				e.Client.Self.Channel.Send(SteamStatus(result), *config.Bot.RecursiveChannelMessages)
+				e.Client.Self.Channel.Send(SteamStatus(result), config.Bot.RecursiveChannelMessages)
 			default:
 				e.Sender.Send(ComandNotFound(result[1]))
 			}
