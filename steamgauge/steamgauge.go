@@ -1,4 +1,4 @@
-// golang steamgaug.es api wrapper
+// go-lang steamgaug.es api wrapper and basic msg html generator
 package steamgauge
 
 import (

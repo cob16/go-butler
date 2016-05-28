@@ -25,7 +25,7 @@ var (
 type Command struct {
 	// Run runs the command.
 	// The args are the arguments after the command name.
-	Run func(cmd *Command, args []string) string
+	Run func(cmd *Command, args []string, sender *gumble.User) string
 
 	// UsageLine is the one-line usage message.
 	// The first word in the line is taken to be the command name.
@@ -61,6 +61,8 @@ func (c *Command) Usage() {
 
 var commands = []*Command{
 	status,
+	connect,
+	id,
 }
 
 //this is generated at init
@@ -136,10 +138,10 @@ func init() {
 // takes a gumble.TextMessageEvent and cmd
 // runs the cmd if it exits and return it's output
 // else return a canned response
-func HandleCmd(args []string) (string, bool) {
+func HandleCmd(args []string, sender *gumble.User) (string, bool) {
 	for _, cmd := range commands {
 		if cmd.Name() == args[1] {
-			return cmd.Run(cmd, args), cmd.PublicResponse
+			return cmd.Run(cmd, args, sender), cmd.PublicResponse
 		}
 	}
 	return CommandNotFound(args[1]), false
@@ -150,7 +152,9 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 	//check for steam connect cmds
 	result := Steamconnect.FindStringSubmatch(e.Message)
 	if result != nil {
-		e.Client.Self.Channel.Send(FormatSteamConnect(result), config.Bot.RecursiveChannelMessages)
+		connect_button := FormatSteamConnect(result)
+		lastconnect = connect_button
+		e.Client.Self.Channel.Send(connect_button, config.Bot.RecursiveChannelMessages)
 	} else {
 		//check for bot commands
 		result = ChatCommand.FindStringSubmatch(e.Message)
@@ -160,7 +164,7 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 				e.Sender.Send(Help(result))
 			} else {
 				log.Infof("User %s (ID:%d) called '%s'", e.Sender.Name, e.Sender.UserID, result[0])
-				responce, PublicResponse := HandleCmd(result)
+				responce, PublicResponse := HandleCmd(result, e.Sender)
 				if PublicResponse { //send to channel
 					e.Client.Self.Channel.Send(responce, config.Bot.RecursiveChannelMessages)
 				} else { //send to usr

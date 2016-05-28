@@ -1,6 +1,9 @@
 package main
 
-import "github.com/njdart/go-butler/steamgauge"
+import (
+	"github.com/njdart/go-butler/steamgauge"
+	"github.com/layeh/gumble/gumble"
+)
 
 var status = &Command{
 	Run:            SteamStatus,
@@ -14,7 +17,7 @@ infomation for that partular game
 `,
 }
 
-func SteamStatus(cmd *Command, args []string) string {
+func SteamStatus(cmd *Command, args []string, sender *gumble.User) string {
 	status, err := steamgauge.GetSteamStatus()
 	if err != nil {
 		log.Panic(err)
