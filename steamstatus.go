@@ -27,6 +27,8 @@ func SteamStatus(cmd *Command, args []string) string {
 			return status.GetStatusCSGO()
 		case "dota":
 			return status.GetStatusDOTA2()
+		case "steam":
+			return status.GetStatusSteam()
 		default:
 			return CommandNotFound(args[0])
 		}

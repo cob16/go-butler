@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 )
 
 type Service struct {
@@ -81,6 +80,14 @@ func (service Service) FmtOnlineHtml() string {
 	}
 }
 
+//returns empty string if no error message
+func filterForErrors(msg string) string {
+	if msg != "No Error" {
+		return msg
+	}
+	return ""
+}
+
 // formats html for status of provided Services
 func getStatusGame(name string, items Service, matchmaking Service) string {
 	return fmt.Sprintf("<strong>%s %s status:</strong> %s %s Item servers (%dms) %s  %s %s %s  %s",
@@ -89,33 +96,41 @@ func getStatusGame(name string, items Service, matchmaking Service) string {
 		HtmlNewLine,
 		items.FmtOnlineHtml(),
 		items.Response_time,
-		items.Error_msg,
+		filterForErrors(items.Error_msg),
 		HtmlNewLine,
 		matchmaking.FmtOnlineHtml(),
 		" Matchmaking servers",
-		matchmaking.Error_msg,
+		filterForErrors(matchmaking.Error_msg),
 	)
 }
 
 // formats html for status of provided Services
-func (service Service) ServiceStatus(name string, service Service, matchmaking Service) string {
-	return fmt.Sprintf("<strong>%s %s status:</strong> %s %s Item servers (%dms) %s  %s %s %s  %s",
-		HtmlNewLine,
-		name,
+func (service Service) ServiceStatus(name string) string {
+	return fmt.Sprintf("%s %s %s (%dms) %s",
 		HtmlNewLine,
 		service.FmtOnlineHtml(),
+		name,
 		service.Response_time,
-		service.Error_msg,
+		filterForErrors(service.Error_msg),
 	)
 }
 
-func (status SteamStatus) getSteamStatus(name string, items Service, matchmaking Service) string {
-	//todo finish this
-	//status.Client.FmtOnlineHtml()
-	//getStatusGame(Community)
-	//getStatusGame(Store)
-	//getStatusGame(User)
-	return error("NOT IPLEMENTED")
+//get the html formatting for the Client scruct
+func (status SteamStatus) ClientOnlineHtml() string {
+	checkbox := Service{Online: status.Client.Online}.FmtOnlineHtml()
+	return fmt.Sprintln(checkbox, "Steam Client")
+}
+
+func (status SteamStatus) GetStatusSteam() string {
+	return fmt.Sprintln(
+		HtmlNewLine,
+		"<strong>Steam Status:</strong>",
+		HtmlNewLine,
+		status.ClientOnlineHtml(),
+		status.Community.ServiceStatus("Steam Community"),
+		status.Store.ServiceStatus("Steam Store"),
+		status.User.ServiceStatus("Steam User"),
+	)
 }
 
 func (status SteamStatus) GetStatusTF2() string {
@@ -130,11 +145,7 @@ func (status SteamStatus) GetStatusDOTA2() string {
 	return getStatusGame("Defense of the Ancients", status.Items.DOTA2, status.Matchmaking.DOTA2)
 }
 
+//get the status of all services
 func (status SteamStatus) GetStatus() string {
-	//todo call getSteamStatus and append
-	//Client
-	//Community
-	//Store
-	//User
-	return strings.Join([]string{status.GetStatusTF2(), status.GetStatusCSGO(), status.GetStatusDOTA2()}, "")
+	return fmt.Sprintln(status.GetStatusSteam(), status.GetStatusTF2(), status.GetStatusCSGO(), status.GetStatusDOTA2())
 }
