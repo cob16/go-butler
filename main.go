@@ -83,7 +83,7 @@ func FormatHelpString(commands []*Command) string {
 }
 
 func FormatCmdHelp(cmd *Command) string {
-	return fmt.Sprintln(cmd.UsageLine, HtmlNewLine, cmd.Long)
+	return fmt.Sprintln(HtmlNewLine, cmd.UsageLine, HtmlNewLine, cmd.Long)
 }
 
 //called with special case case in HandleMessage

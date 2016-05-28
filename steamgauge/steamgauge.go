@@ -25,7 +25,7 @@ type ValveGameService struct {
 //struct that holds all provided json data
 type SteamStatus struct {
 	Client struct {
-		online int `json:"online"`
+		Online int `json:"online"`
 	} `json:"ISteamClient"`
 	Community   Service          `json:"SteamCommunity"`
 	Store       Service          `json:"SteamStore"`
@@ -82,7 +82,7 @@ func (service Service) FmtOnlineHtml() string {
 }
 
 // formats html for status of provided Services
-func getStatus(name string, items Service, matchmaking Service) string {
+func getStatusGame(name string, items Service, matchmaking Service) string {
 	return fmt.Sprintf("<strong>%s %s status:</strong> %s %s Item servers (%dms) %s  %s %s %s  %s",
 		HtmlNewLine,
 		name,
@@ -97,18 +97,44 @@ func getStatus(name string, items Service, matchmaking Service) string {
 	)
 }
 
+// formats html for status of provided Services
+func (service Service) ServiceStatus(name string, service Service, matchmaking Service) string {
+	return fmt.Sprintf("<strong>%s %s status:</strong> %s %s Item servers (%dms) %s  %s %s %s  %s",
+		HtmlNewLine,
+		name,
+		HtmlNewLine,
+		service.FmtOnlineHtml(),
+		service.Response_time,
+		service.Error_msg,
+	)
+}
+
+func (status SteamStatus) getSteamStatus(name string, items Service, matchmaking Service) string {
+	//todo finish this
+	//status.Client.FmtOnlineHtml()
+	//getStatusGame(Community)
+	//getStatusGame(Store)
+	//getStatusGame(User)
+	return error("NOT IPLEMENTED")
+}
+
 func (status SteamStatus) GetStatusTF2() string {
-	return getStatus("Team Fortress 2", status.Items.TF2, status.Matchmaking.TF2)
+	return getStatusGame("Team Fortress 2", status.Items.TF2, status.Matchmaking.TF2)
 }
 
 func (status SteamStatus) GetStatusCSGO() string {
-	return getStatus("Counter-Strike: Global Offensive", status.Items.CSGO, status.Matchmaking.CSGO)
+	return getStatusGame("Counter-Strike: Global Offensive", status.Items.CSGO, status.Matchmaking.CSGO)
 }
 
 func (status SteamStatus) GetStatusDOTA2() string {
-	return getStatus("Defense of the Ancients", status.Items.DOTA2, status.Matchmaking.DOTA2)
+	return getStatusGame("Defense of the Ancients", status.Items.DOTA2, status.Matchmaking.DOTA2)
 }
 
 func (status SteamStatus) GetStatus() string {
+	//todo call getSteamStatus and append
+	//Client
+	//Community
+	//Store
+	//User
 	return strings.Join([]string{status.GetStatusTF2(), status.GetStatusCSGO(), status.GetStatusDOTA2()}, "")
 }
