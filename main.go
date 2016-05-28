@@ -62,7 +62,6 @@ func (c *Command) Usage() {
 var commands = []*Command{
 	status,
 	connect,
-	id,
 }
 
 //this is generated at init
