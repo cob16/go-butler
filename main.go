@@ -112,7 +112,7 @@ func CommandNotFound(usrInput string) string {
 // Create a html button to push that will allow joining
 // into a multilayer source enging game server
 func FormatSteamConnect(result []string) string {
-	log.Info("steam link match ip: %d pass: %d", result[1], result[2])
+	log.Info("steam link match ip: %s pass: %s", result[1], result[2])
 	button := fmt.Sprintf("<br />IP: %s <br /> PASS: %s <br /><strong><a href='steam://connect/%s/%s'>CLICK TO CONNECT TO SERVER</a></strong><br />",
 		result[1], result[2], result[1], result[2])
 	log.Debug(button)
@@ -122,7 +122,7 @@ func FormatSteamConnect(result []string) string {
 func init() {
 	HelpString = FormatHelpString(commands)
 
-	steamconnect, err := regexp.Compile(`connect ([A-Za-z0-9.:]+); *password (.*)`) //connect <ip>; <password>
+	steamconnect, err := regexp.Compile(`^connect ([A-Za-z0-9.:]+); *password (\S*)\b`) //connect <ip>; <password>
 	if err != nil {
 		panic(err)
 	}
@@ -153,6 +153,7 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 	if result != nil {
 		connect_button := FormatSteamConnect(result)
 		lastconnect = connect_button
+		lastconnect_raw = e.Message
 		e.Client.Self.Channel.Send(connect_button, config.Bot.RecursiveChannelMessages)
 	} else {
 		//check for bot commands

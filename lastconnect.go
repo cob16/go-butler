@@ -1,8 +1,8 @@
 package main
 
 import (
-  "fmt"
-  "github.com/layeh/gumble/gumble"
+	"fmt"
+	"github.com/layeh/gumble/gumble"
 )
 
 var connect = &Command{
@@ -19,16 +19,20 @@ note: This will replace the connect string with your user ID!
 }
 
 var lastconnect string = "There is not yet a connect!"
+var lastconnect_raw string = "There is not yet a connect!"
 
 func Lastconnect(cmd *Command, args []string, sender *gumble.User) string {
-  if args[2] != "" {
+	if args[2] != "" {
 		switch args[2] {
 		case "delete":
-      lastconnect = fmt.Sprintf("The last connect was deleted by '%s' ID: %d ", sender.Name, sender.UserID)
+			lastconnect = fmt.Sprintf("The last connect was deleted by '%s' ID: %d ", sender.Name, sender.UserID)
+			lastconnect_raw = lastconnect
 			return lastconnect
+		case "raw":
+			return lastconnect_raw
 		default:
 			return CommandNotFound(args[0])
 		}
 	}
-  return lastconnect
+	return lastconnect
 }
