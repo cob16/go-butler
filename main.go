@@ -12,6 +12,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"flag"
 )
 
 var (
@@ -176,10 +177,26 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 }
 
 func main() {
-	config, err := configuration.LoadConfiguration()
+	configPath := flag.String("c", os.Getenv("BUTLERCONFIG"), "Path to config file")
+	server := flag.String("h", "", "Override server address")
+	port := flag.Int("p", 0, "Override port")
+	console := flag.Bool("-console", false, "Force logging to stdout")
+	flag.Parse()
+
+	config, err := configuration.LoadConfiguration(*configPath)
 	if err != nil {
 		panic(err)
 	}
+	if *console {
+		config.Log.File = ""
+	}
+	if *server != "" {
+		config.Server.Host = *server
+	}
+	if *port != 0 {
+		config.Server.Port = *port
+	}
+
 	log = config.GetLogger()
 	log.Info("go-butler has sucessfully started!")
 	tlsConfig, gumbleConfig := config.ExplodeConfiguration()
