@@ -74,10 +74,13 @@ func initLog(useStdLogger bool, config ButlerConfiguration) {
 // Loads config from file name
 // returns config ButlerConfiguration struct + err
 // also sets Config var
-func LoadConfiguration() (ButlerConfiguration, error) {
+func LoadConfiguration(configurationPath string) (ButlerConfiguration, error) {
+	if configurationPath == "" {
+		configurationPath = "config.json"
+	}
 	var configuration ButlerConfiguration
 
-	file, readErr := ioutil.ReadFile("config.json")
+	file, readErr := ioutil.ReadFile(configurationPath)
 	if readErr != nil {
 		return configuration, readErr
 	}
