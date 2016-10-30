@@ -21,7 +21,8 @@ note: This will replace the connect string with your user ID!
 var lastconnect string = "There is not yet a connect!"
 var lastconnect_raw string = "There is not yet a connect!"
 
-func Lastconnect(cmd *Command, args []string, sender *gumble.User) string {
+func Lastconnect(cmd *Command, args []string, event *gumble.TextMessageEvent) string {
+	sender := event.Sender
 	if args[2] != "" {
 		switch args[2] {
 		case "delete":

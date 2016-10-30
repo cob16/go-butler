@@ -17,7 +17,7 @@ infomation for that partular game
 `,
 }
 
-func SteamStatus(cmd *Command, args []string, sender *gumble.User) string {
+func SteamStatus(cmd *Command, args []string, event *gumble.TextMessageEvent) string {
 	status, err := steamgauge.GetSteamStatus()
 	if err != nil {
 		log.Panic(err)

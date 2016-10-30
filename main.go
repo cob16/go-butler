@@ -26,7 +26,7 @@ var (
 type Command struct {
 	// Run runs the command.
 	// The args are the arguments after the command name.
-	Run func(cmd *Command, args []string, sender *gumble.User) string
+	Run func(cmd *Command, args []string, sender *gumble.TextMessageEvent) string
 
 	// UsageLine is the one-line usage message.
 	// The first word in the line is taken to be the command name.
@@ -63,6 +63,7 @@ func (c *Command) Usage() {
 var commands = []*Command{
 	status,
 	connect,
+	joinme,
 }
 
 //this is generated at init
@@ -138,10 +139,10 @@ func init() {
 // takes a gumble.TextMessageEvent and cmd
 // runs the cmd if it exits and return it's output
 // else return a canned response
-func HandleCmd(args []string, sender *gumble.User) (string, bool) {
+func HandleCmd(args []string, event *gumble.TextMessageEvent) (string, bool) {
 	for _, cmd := range commands {
 		if cmd.Name() == args[1] {
-			return cmd.Run(cmd, args, sender), cmd.PublicResponse
+			return cmd.Run(cmd, args, event), cmd.PublicResponse
 		}
 	}
 	return CommandNotFound(args[1]), false
@@ -161,11 +162,11 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 		result = ChatCommand.FindStringSubmatch(e.Message)
 		if result != nil {
 			if result[1] == "help" {
-				//special case to avoid  initialization loop
+				//special case to avoid initialization loop
 				e.Sender.Send(Help(result))
 			} else {
 				log.Infof("User %s (ID:%d) called '%s'", e.Sender.Name, e.Sender.UserID, result[0])
-				responce, PublicResponse := HandleCmd(result, e.Sender)
+				responce, PublicResponse := HandleCmd(result, e)
 				if PublicResponse { //send to channel
 					e.Client.Self.Channel.Send(responce, config.Bot.RecursiveChannelMessages)
 				} else { //send to usr
