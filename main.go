@@ -124,7 +124,7 @@ func FormatSteamConnect(result []string) string {
 func init() {
 	HelpString = FormatHelpString(commands)
 
-	steamconnect, err := regexp.Compile(`^connect ([A-Za-z0-9.:]+); *password (\S*)\b`) //connect <ip>; <password>
+	steamconnect, err := regexp.Compile(`^connect ([A-Za-z0-9.:]+); *password ([^<\n]*)`) //connect <ip>; <password> (ignore <html> and newline)
 	if err != nil {
 		panic(err)
 	}
@@ -150,8 +150,8 @@ func HandleCmd(args []string, event *gumble.TextMessageEvent) (string, bool) {
 
 //parse steam connect strings and provide a html button to the channel
 func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfiguration) {
-	//check for steam connect cmds
-	result := Steamconnect.FindStringSubmatch(e.Message)
+	message := gumbleutil.PlainText(&e.TextMessage)
+	result := Steamconnect.FindStringSubmatch(message) 	//check for steam connect cmds
 	if result != nil {
 		connect_button := FormatSteamConnect(result)
 		lastconnect = connect_button
@@ -159,13 +159,14 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 		e.Client.Self.Channel.Send(connect_button, config.Bot.RecursiveChannelMessages)
 	} else {
 		//check for bot commands
-		result = ChatCommand.FindStringSubmatch(e.Message)
+		result = ChatCommand.FindStringSubmatch(message)
 		if result != nil {
 			if result[1] == "help" {
 				//special case to avoid initialization loop
 				e.Sender.Send(Help(result))
 			} else {
 				log.Infof("User %s (ID:%d) called '%s'", e.Sender.Name, e.Sender.UserID, result[0])
+
 				responce, PublicResponse := HandleCmd(result, e)
 				if PublicResponse { //send to channel
 					e.Client.Self.Channel.Send(responce, config.Bot.RecursiveChannelMessages)
