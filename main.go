@@ -1,5 +1,4 @@
-// A mumble bot based on the Gumble libary
-// https://github.com/layeh/gumble/
+// A mumble bot based on the Gumble libary 
 package main
 
 import (
@@ -7,7 +6,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"layeh.com/gumble/gumble"
 	"layeh.com/gumble/gumbleutil"
-	"github.com/njdart/go-butler/configuration"
+	"github.com/cob16/go-butler/configuration"
 	"net"
 	"os"
 	"regexp"
