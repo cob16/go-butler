@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/layeh/gumble/gumble"
+	"layeh.com/gumble/gumble"
 )
 
 var connect = &Command{

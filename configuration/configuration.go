@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/layeh/gumble/gumble"
+	"layeh.com/gumble/gumble"
 	"os"
 )
 

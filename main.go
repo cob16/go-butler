@@ -5,8 +5,8 @@ package main
 import (
 	"fmt"
 	"github.com/Sirupsen/logrus"
-	"github.com/layeh/gumble/gumble"
-	"github.com/layeh/gumble/gumbleutil"
+	"layeh.com/gumble/gumble"
+	"layeh.com/gumble/gumbleutil"
 	"github.com/njdart/go-butler/configuration"
 	"net"
 	"os"

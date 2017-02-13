@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/njdart/go-butler/steamgauge"
-	"github.com/layeh/gumble/gumble"
+	"layeh.com/gumble/gumble"
 )
 
 var status = &Command{

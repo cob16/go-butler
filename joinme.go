@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/layeh/gumble/gumble"
 	"fmt"
+	"layeh.com/gumble/gumble"
 )
 
 var joinme = &Command{
