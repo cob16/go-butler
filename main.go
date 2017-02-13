@@ -209,7 +209,6 @@ func main() {
 			}
 		},
 		TextMessage: func(e *gumble.TextMessageEvent) {
-			log.Infof("Text message from '%s'(id: %d): %s\n",e.Sender.Name, e.Sender.UserID, e.Message)
 			HandleMessage(e, &config)
 		},
 		//kill the program if we are disconnected
