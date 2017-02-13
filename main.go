@@ -180,8 +180,8 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 
 func main() {
 	configPath := flag.String("c", os.Getenv("BUTLERCONFIG"), "Path to config file")
-	server := flag.String("h", "", "Override server address")
-	port := flag.Int("p", 0, "Override port")
+	hostname := flag.String("h", "", "Override server address, implies you are allso overriding port (port flag can be ignored for mumble default)")
+	port := flag.Int("p", 64738, "Override port")
 	console := flag.Bool("-console", false, "Force logging to stdout")
 	flag.Parse()
 
@@ -192,11 +192,9 @@ func main() {
 	if *console {
 		config.Log.File = ""
 	}
-	if *server != "" {
-		config.Server.Host = *server
-	}
-	if *port != 0 {
-		config.Server.Port = *port
+	if *hostname != "" {
+		config.Server.Host = *hostname
+		config.Server.Port = *port //changing the host implies overriding port
 	}
 
 	log = config.GetLogger()
