@@ -1,11 +1,12 @@
 {
   "log": {
     "file": "./butler.log",
-    "level": "error"
+    "level": "info"
   },
   "bot": {
     "username": "GoButler",
     "recursiveChannelMessages" : true,
+    "defaultChannel": "",
     "accessTokens": [
       "exampleToken"
     ]
@@ -15,7 +16,8 @@
     "port": 64738,
     "insecureSkipVerify": true
   },
-  "features": {
-
+  "greeter": {
+    "welcomeUsers": false,
+    "passConnectOnChannelJoin": true
   }
 }

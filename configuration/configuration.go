@@ -19,6 +19,7 @@ type ButlerConfiguration struct {
 	Bot struct {
 		Username                 string   `json:"username"`
 		RecursiveChannelMessages bool     `json:"recursiveChannelMessages"`
+		DefaultChannel           string   `json:"defaultChannel"`
 		AccessTokens             []string `json:"accessTokens"`
 	} `json:"bot"`
 	Server struct {
@@ -26,8 +27,10 @@ type ButlerConfiguration struct {
 		Port               int    `json:"port"`
 		InsecureSkipVerify bool   `json:"insecureSkipVerify"`
 	} `json:"server"`
-	Features struct {
-	} `json:"features"`
+	Greeter struct {
+		WelcomeUsers             bool `json:"welcomeUsers"`
+		PassConnectOnChannelJoin bool `json:"passConnectOnChannelJoin"`
+	} `json:"greeter"`
 }
 
 var Logger *logrus.Logger
@@ -36,38 +39,35 @@ func (cfg *ButlerConfiguration) GetLogger() *logrus.Logger {
 	return Logger
 }
 
-// set 'Logger' to the desired logger.
+// set 'Logger' to the desired logger.	
 // True for std logger False for logrus
-func initLog(useStdLogger bool, config ButlerConfiguration) {
-	logcfg := config.Log
-	if !useStdLogger {
-		Logger = logrus.New()
-		//Logger.SetFormatter(&Logger.JSONFormatter{})
+func initLog(File string, Level string) {
+	Logger = logrus.New()
+	//Logger.SetFormatter(&Logger.JSONFormatter{})
 
-		//if not empty write to file (else STDout)
-		if logcfg.File != "" {
-			file, err := os.OpenFile(logcfg.File, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-			if err != nil {
-				panic(err)
-			}
-			Logger.Out = file
-		} else {
-			Logger.Out = os.Stdout
+	//if not empty write to file (else STDout)
+	if File != "" {
+		file, err := os.OpenFile(File, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if err != nil {
+			panic(err)
 		}
-		// set log the warning severity
-		switch logcfg.Level {
-		case "":
-			Logger.Level = logrus.InfoLevel
-			Logger.Info("No logging level set settting to Info")
-		case "error":
-			Logger.Level = logrus.ErrorLevel
-		case "warning":
-			Logger.Level = logrus.WarnLevel
-		case "debug":
-			Logger.Level = logrus.DebugLevel
-		default:
-			panic("unrecognized logger level")
-		}
+		Logger.Out = file
+	} else {
+		Logger.Out = os.Stdout
+	}
+	// set log the warning severity
+	switch Level {
+	case "", "info":
+		Logger.Info("No logging level set settting to Info")
+		Logger.Level = logrus.InfoLevel
+	case "error":
+		Logger.Level = logrus.ErrorLevel
+	case "warning":
+		Logger.Level = logrus.WarnLevel
+	case "debug":
+		Logger.Level = logrus.DebugLevel
+	default:
+		panic("Unrecognized logger level")
 	}
 }
 
@@ -85,27 +85,26 @@ func LoadConfiguration(configurationPath string) (ButlerConfiguration, error) {
 		return configuration, readErr
 	}
 
-	fmt.Printf("%+v\n", configuration) //last print before we get the logger going
 	json.Unmarshal(file, &configuration)
 
-	initLog(false, configuration)
+	initLog(configuration.Log.File, configuration.Log.Level)
+	Logger.Debug("Logger started")
 
 	return configuration, nil
 }
 
-func (cfg *ButlerConfiguration) ExplodeConfiguration() (tls.Config, gumble.Config) {
+func (cfg *ButlerConfiguration) GetGumbleConfig() (tls.Config, gumble.Config) {
 
 	tlsConfig := tls.Config{}
-	tlsConfig.InsecureSkipVerify = true
-
-	Logger.Info(tlsConfig)
+	tlsConfig.InsecureSkipVerify = cfg.Server.InsecureSkipVerify
 
 	gumbleConfig := gumble.Config{}
 
 	if len(cfg.Bot.Username) > 0 {
 		gumbleConfig.Username = cfg.Bot.Username
 	} else {
-		gumbleConfig.Username = "gumble-test"
+		Logger.Warn("No user set falling back to user GoButler")
+		gumbleConfig.Username = "GoButler"
 	}
 	gumbleConfig.Tokens = cfg.Bot.AccessTokens
 
