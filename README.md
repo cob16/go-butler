@@ -14,9 +14,14 @@ A mumble bot based on the [Gumble libary](https://github.com/layeh/gumble/)
 ## Features
 - [x] Load from config file
 - [x] Load acess tokens
-- [x] logging
-- [x] format source connect cmds to button
-- [ ] Tests
+- [x] Get steam api status such as item servers etc [steam gauges](https://steamgaug.es/docs)
+- [x] Format source connect cmds to button and give the connect to newly connected users
+
+## Dev Features
+- 'Modular' commands
+- Logging
+
+## Todo
+- [ ] Functional tests agent a real mumble sever? (test bot end to end)
 - [ ] check ACL's so that cmds can be made admin only
-- [x] intgrate [steam gauges](https://steamgaug.es/docs)
 - [ ] Be able to talk back to users
