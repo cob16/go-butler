@@ -1,17 +1,17 @@
-// A mumble bot based on the Gumble libary 
+// A mumble bot based on the Gumble libary
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/Sirupsen/logrus"
+	"github.com/cob16/go-butler/configuration"
 	"layeh.com/gumble/gumble"
 	"layeh.com/gumble/gumbleutil"
-	"github.com/cob16/go-butler/configuration"
 	"net"
 	"os"
 	"regexp"
 	"strings"
-	"flag"
 )
 
 var (
@@ -42,7 +42,6 @@ type Command struct {
 	PublicResponse bool
 }
 
-//yes more duplication as that package is not importable
 // Name returns the command's name: the first word in the usage line.
 func (c *Command) Name() string {
 	name := c.UsageLine
@@ -67,6 +66,9 @@ var commands = []*Command{
 
 //this is generated at init
 var HelpString string
+
+//The name you call to get help
+const HelpCmdName string = "help"
 
 var help = &Command{
 	PublicResponse: false,
@@ -110,16 +112,6 @@ func CommandNotFound(usrInput string) string {
 	return fmt.Sprintf("%s No command '%s' found! %s", HtmlNewLine, usrInput, HelpString)
 }
 
-// Create a html button to push that will allow joining
-// into a multilayer source enging game server
-func FormatSteamConnect(result []string) string {
-	log.Info("steam link match ip: %s pass: %s", result[1], result[2])
-	button := fmt.Sprintf("<br />IP: %s <br /> PASS: %s <br /><strong><a href='steam://connect/%s/%s'>CLICK TO CONNECT TO SERVER</a></strong><br />",
-		result[1], result[2], result[1], result[2])
-	log.Debug(button)
-	return button
-}
-
 func init() {
 	HelpString = FormatHelpString(commands)
 
@@ -150,18 +142,24 @@ func HandleCmd(args []string, event *gumble.TextMessageEvent) (string, bool) {
 //parse steam connect strings and provide a html button to the channel
 func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfiguration) {
 	message := gumbleutil.PlainText(&e.TextMessage)
-	result := Steamconnect.FindStringSubmatch(message) 	//check for steam connect cmds
+	result := Steamconnect.FindStringSubmatch(message) //check for steam connect cmds
 	if result != nil {
-		connect_button := FormatSteamConnect(result)
-		lastconnect = connect_button
-		lastconnect_raw = e.Message
-		e.Client.Self.Channel.Send(connect_button, config.Bot.RecursiveChannelMessages)
+		log.Infof("steam link match ip: %s pass: %s", result[1], result[2])
+		currentConnect = &SourceConnect{
+			hostname: result[1],
+			password: result[2],
+			UserID:   e.Sender.UserID,
+		}
+		currentConnectHTML, currentConnectString = currentConnect.GenConnectString()
+
+		e.Client.Self.Channel.Send(currentConnectHTML, config.Bot.RecursiveChannelMessages)
 	} else {
 		//check for bot commands
 		result = ChatCommand.FindStringSubmatch(message)
 		if result != nil {
-			if result[1] == "help" {
+			if result[1] == HelpCmdName {
 				//special case to avoid initialization loop
+				log.Infof("User %s (ID:%d) called '!%s'", e.Sender.Name, e.Sender.UserID, HelpCmdName)
 				e.Sender.Send(Help(result))
 			} else {
 				log.Infof("User %s (ID:%d) called '%s'", e.Sender.Name, e.Sender.UserID, result[0])
@@ -172,8 +170,18 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 				} else { //send to usr
 					e.Sender.Send(responce)
 				}
+				log.Debugf("Returning to user username:'%s' id:%d PublicResponse: %t with the message:\n%s", e.Sender.Name, e.Sender.UserID, PublicResponse, responce)
 			}
 		}
+	}
+}
+
+func Greeter(e *gumble.UserChangeEvent, config *configuration.ButlerConfiguration) {
+	if config.Greeter.WelcomeUsers && e.Type.Has(gumble.UserChangeConnected) {
+		e.User.Send("Welcome to the server, " + e.User.Name + "!")
+	}
+	if config.Greeter.PassConnectOnChannelJoin && e.Type.Has(gumble.UserChangeChannel) && (e.User.Channel.ID == e.Client.Self.Channel.ID) {
+		e.Client.Self.Channel.Send(currentConnectHTML, false)
 	}
 }
 
@@ -181,7 +189,7 @@ func main() {
 	configPath := flag.String("c", os.Getenv("BUTLERCONFIG"), "Path to config file")
 	hostname := flag.String("h", "", "Override server address, implies you are allso overriding port (port flag can be ignored for mumble default)")
 	port := flag.Int("p", 64738, "Override port")
-	console := flag.Bool("-console", false, "Force logging to stdout")
+	console := flag.Bool("console", false, "Force logging to stdout")
 	flag.Parse()
 
 	config, err := configuration.LoadConfiguration(*configPath)
@@ -193,27 +201,26 @@ func main() {
 	}
 	if *hostname != "" {
 		config.Server.Host = *hostname
-		config.Server.Port = *port //changing the host implies overriding port
+		config.Server.Port = *port
 	}
 
 	log = config.GetLogger()
+	log.Debugf("Given config parsed:\n%+v", config)
 	log.Info("go-butler has sucessfully started!")
-	tlsConfig, gumbleConfig := config.ExplodeConfiguration()
+	tlsConfig, gumbleConfig := config.GetGumbleConfig()
 
 	keepAlive := make(chan bool)
 
 	gumbleConfig.Attach(gumbleutil.Listener{
 		UserChange: func(e *gumble.UserChangeEvent) {
-			if e.Type.Has(gumble.UserChangeConnected) {
-				e.User.Send("Welcome to the server, " + e.User.Name + "!")
-			}
+			Greeter(e, &config)
 		},
 		TextMessage: func(e *gumble.TextMessageEvent) {
 			HandleMessage(e, &config)
 		},
 		//kill the program if we are disconnected
 		Disconnect: func(e *gumble.DisconnectEvent) {
-			log.Info("gumble was Disconnected from the server")
+			log.Info("gobuter was Disconnected from the server")
 			keepAlive <- true
 		},
 	})
