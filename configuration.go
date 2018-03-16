@@ -85,11 +85,11 @@ func LoadConfiguration(configurationPath string) (ButlerConfiguration, error) {
 	if err != nil {
 		return configuration, err
 	}
-	defer file.Close()
-	fileContent, err := ioutil.ReadAll(file)
-	if err != nil {
-		return configuration, err
+	fileContent, moreerr := ioutil.ReadAll(file)
+	if moreerr != nil {
+		return configuration, moreerr
 	}
+	file.Close()
 
 	json.Unmarshal(fileContent, &configuration)
 
