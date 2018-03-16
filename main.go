@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/Sirupsen/logrus"
-	"github.com/cob16/go-butler/configuration"
 	"layeh.com/gumble/gumble"
 	"layeh.com/gumble/gumbleutil"
 	"net"
@@ -140,7 +139,7 @@ func HandleCmd(args []string, event *gumble.TextMessageEvent) (string, bool) {
 }
 
 //parse steam connect strings and provide a html button to the channel
-func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfiguration) {
+func HandleMessage(e *gumble.TextMessageEvent, config *ButlerConfiguration) {
 	message := gumbleutil.PlainText(&e.TextMessage)
 	result := Steamconnect.FindStringSubmatch(message) //check for steam connect cmds
 	if result != nil {
@@ -176,7 +175,7 @@ func HandleMessage(e *gumble.TextMessageEvent, config *configuration.ButlerConfi
 	}
 }
 
-func Greeter(e *gumble.UserChangeEvent, config *configuration.ButlerConfiguration) {
+func Greeter(e *gumble.UserChangeEvent, config *ButlerConfiguration) {
 	if config.Greeter.WelcomeUsers && e.Type.Has(gumble.UserChangeConnected) {
 		e.User.Send("Welcome to the server, " + e.User.Name + "!")
 	}
@@ -192,7 +191,7 @@ func main() {
 	console := flag.Bool("console", false, "Force logging to stdout")
 	flag.Parse()
 
-	config, err := configuration.LoadConfiguration(*configPath)
+	config, err := LoadConfiguration(*configPath)
 	if err != nil {
 		panic(err)
 	}
@@ -205,7 +204,7 @@ func main() {
 	}
 
 	log = config.GetLogger()
-	log.Debugf("Given config parsed:\n%+v", config)
+	log.Infof("Given config parsed:\n%+v", config)
 	log.Info("go-butler has sucessfully started!")
 	tlsConfig, gumbleConfig := config.GetGumbleConfig()
 

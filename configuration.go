@@ -1,4 +1,4 @@
-package configuration
+package main
 
 import (
 	"crypto/tls"
@@ -56,14 +56,17 @@ func initLog(File string, Level string) {
 	// set log the warning severity
 	switch Level {
 	case "", "info":
-		Logger.Info("No logging level set settting to Info")
 		Logger.Level = logrus.InfoLevel
+		Logger.Info("Set log level to info")
 	case "error":
 		Logger.Level = logrus.ErrorLevel
+		Logger.Info("Set log level to error")
 	case "warning":
 		Logger.Level = logrus.WarnLevel
+		Logger.Info("Set log level to warn")
 	case "debug":
 		Logger.Level = logrus.DebugLevel
+		Logger.Info("Set log level to debug")
 	default:
 		panic("Unrecognized logger level")
 	}
