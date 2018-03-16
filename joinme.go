@@ -26,15 +26,14 @@ func joinUser(cmd *Command, args []string, event *gumble.TextMessageEvent) strin
 	var excuse string = fmt.Sprintf("'%s' is asking for my services in '%s'. Please Excuse me",
 		event.Sender.Name,
 		event.Sender.Channel.Name,
-		)
+	)
 	log.Info(excuse)
 	event.Client.Self.Channel.Send(excuse, false)
-
 
 	event.Client.Self.Move(event.Sender.Channel)
 
 	return fmt.Sprintf("Moved to '%s' from '%s' by'%s'",
 		event.Sender.Channel.Name,
 		event.Client.Self.Channel.Name,
-		event.Sender.Name,)
+		event.Sender.Name)
 }

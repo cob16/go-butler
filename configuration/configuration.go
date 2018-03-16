@@ -39,8 +39,6 @@ func (cfg *ButlerConfiguration) GetLogger() *logrus.Logger {
 	return Logger
 }
 
-// set 'Logger' to the desired logger.	
-// True for std logger False for logrus
 func initLog(File string, Level string) {
 	Logger = logrus.New()
 	//Logger.SetFormatter(&Logger.JSONFormatter{})

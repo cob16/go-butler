@@ -224,7 +224,13 @@ func main() {
 		log.Panic(err)
 	} else {
 		log.Info("connected!")
-		log.Debug(client.State())
+		if config.Bot.DefaultChannel != "" {
+			defaultChannel := client.Channels.Find(config.Bot.DefaultChannel)
+			if defaultChannel != nil {
+				log.Infof("Moving to default channel '%s'", defaultChannel.Name)
+				client.Self.Move(defaultChannel)
+			}
+		}
 	}
 
 	<-keepAlive
