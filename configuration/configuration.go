@@ -78,12 +78,17 @@ func LoadConfiguration(configurationPath string) (ButlerConfiguration, error) {
 	}
 	var configuration ButlerConfiguration
 
-	file, readErr := ioutil.ReadFile(configurationPath)
-	if readErr != nil {
-		return configuration, readErr
+	file, err := os.Open(configurationPath)
+	if err != nil {
+		return configuration, err
+	}
+	defer file.Close()
+	fileContent, err := ioutil.ReadAll(file)
+	if err != nil {
+		return configuration, err
 	}
 
-	json.Unmarshal(file, &configuration)
+	json.Unmarshal(fileContent, &configuration)
 
 	initLog(configuration.Log.File, configuration.Log.Level)
 	Logger.Debug("Logger started")
